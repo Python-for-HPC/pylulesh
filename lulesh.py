@@ -3,7 +3,7 @@
 This file contains the computational core of PyLULESH.
 """
 
-import numpy as np
+import ramba as np
 from constants import *
 from domain import Domain, intarr, realarr, RealT
 from typing import Dict, Tuple
@@ -276,17 +276,24 @@ def calc_elem_volume_derivative(x: realarr, y: realarr, z: realarr):
     return dvdx, dvdy, dvdz
 
 
+def einsum1(x,y):
+    return (x * np.broadcast_to(np.expand_dims(y, 2), x.shape)).sum(axis=1)
+
+
 def calc_elem_fb_hourglass_force(xd: realarr, yd: realarr, zd: realarr,
                                  hourgam: realarr, coefficient: realarr):
     hgfx = np.ndarray([xd.shape[0], 8], dtype=xd.dtype)
     hgfy = np.ndarray([xd.shape[0], 8], dtype=xd.dtype)
     hgfz = np.ndarray([xd.shape[0], 8], dtype=xd.dtype)
 
-    hxx = np.einsum('eji,ej->ei', hourgam, xd)
+    hxx = einsum1(hourgam, xd)
+    #hxx = np.einsum('eji,ej->ei', hourgam, xd)
     hgfx = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
-    hxx = np.einsum('eji,ej->ei', hourgam, yd)
+    hxx = einsum1(hourgam, yd)
+    #hxx = np.einsum('eji,ej->ei', hourgam, yd)
     hgfy = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
-    hxx = np.einsum('eji,ej->ei', hourgam, zd)
+    hxx = einsum1(hourgam, zd)
+    #hxx = np.einsum('eji,ej->ei', hourgam, zd)
     hgfz = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
 
     return hgfx, hgfy, hgfz

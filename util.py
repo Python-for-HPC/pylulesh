@@ -4,7 +4,7 @@ Various utilities and helper functions.
 """
 
 from dataclasses import dataclass
-import numpy as np
+import ramba as np
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:

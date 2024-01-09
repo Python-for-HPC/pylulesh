@@ -3,16 +3,16 @@
 File containing the primary data structure used in LULESH.
 """
 from dataclasses import dataclass
-import numpy.typing as npt
-import numpy as np
+#import ramba.typing as npt
+import ramba as np
 
 from constants import ZETA, ETA, XI
 
-# Type hints for numpy arrays
+# Type hints for ramba arrays
 IndexT = np.int32
 RealT = np.float64
-intarr = npt.NDArray[IndexT]
-realarr = npt.NDArray[RealT]
+intarr = np.ndarray
+realarr = np.ndarray
 
 
 @dataclass
