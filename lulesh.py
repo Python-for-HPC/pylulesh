@@ -279,6 +279,8 @@ def calc_elem_volume_derivative(x: realarr, y: realarr, z: realarr):
 def einsum1(x,y):
     return (x * np.broadcast_to(np.expand_dims(y, 2), x.shape)).sum(axis=1)
 
+def einsum2(x,y):
+    return (x * np.broadcast_to(np.expand_dims(y, 1), x.shape)).sum(axis=2)
 
 def calc_elem_fb_hourglass_force(xd: realarr, yd: realarr, zd: realarr,
                                  hourgam: realarr, coefficient: realarr):
@@ -286,15 +288,19 @@ def calc_elem_fb_hourglass_force(xd: realarr, yd: realarr, zd: realarr,
     hgfy = np.ndarray([xd.shape[0], 8], dtype=xd.dtype)
     hgfz = np.ndarray([xd.shape[0], 8], dtype=xd.dtype)
 
-    hxx = einsum1(hourgam, xd)
     #hxx = np.einsum('eji,ej->ei', hourgam, xd)
-    hgfx = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
-    hxx = einsum1(hourgam, yd)
+    #hgfx = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
     #hxx = np.einsum('eji,ej->ei', hourgam, yd)
-    hgfy = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
-    hxx = einsum1(hourgam, zd)
+    #hgfy = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
     #hxx = np.einsum('eji,ej->ei', hourgam, zd)
-    hgfz = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
+    #hgfz = coefficient[:, None] * np.einsum('eji,ei->ej', hourgam, hxx)
+
+    hxx = einsum1(hourgam, xd)
+    hgfx = coefficient[:, None] * einsum2(hourgam, hxx)
+    hxx = einsum1(hourgam, yd)
+    hgfy = coefficient[:, None] * einsum2(hourgam, hxx)
+    hxx = einsum1(hourgam, zd)
+    hgfz = coefficient[:, None] * einsum2(hourgam, hxx)
 
     return hgfx, hgfy, hgfz
 
